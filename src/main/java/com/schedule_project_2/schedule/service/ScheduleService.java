@@ -6,6 +6,7 @@ import com.schedule_project_2.schedule.entity.Schedule;
 import com.schedule_project_2.schedule.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
 
+    @Transactional
     public ScheduleResponse createSchedule(String title, String content, String author){
         Schedule schedule = new Schedule(title,content, author);
         Schedule saveSchedule = scheduleRepository.save(schedule);
@@ -29,6 +31,7 @@ public class ScheduleService {
         return response;
     }
 
+    @Transactional(readOnly = true)
     public ScheduleResponse getSchedule(Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 일정입니다."));
@@ -44,6 +47,7 @@ public class ScheduleService {
         return response;
     }
 
+    @Transactional(readOnly = true)
     public ScheduleListResponse getAllSchedule(String author){
         List<Schedule> scheduleList;
         if(author == null){
