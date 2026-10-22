@@ -4,6 +4,7 @@ import com.schedule_project_2.schedule.dto.response.ScheduleListResponse;
 import com.schedule_project_2.schedule.dto.response.ScheduleResponse;
 import com.schedule_project_2.schedule.entity.Schedule;
 import com.schedule_project_2.schedule.repository.ScheduleRepository;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,5 +73,26 @@ public class ScheduleService {
         ScheduleListResponse response = new ScheduleListResponse(scheduleListResponse);
 
         return response;
+    }
+
+    @Transactional
+    public ScheduleResponse updateSchedule(Long scheduleId, String title, String content) {
+
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                        .orElseThrow(()-> new IllegalStateException("일정이 존재하지 않습니다."));
+
+        schedule.updateSchedule(title, content);
+
+        ScheduleResponse response = new ScheduleResponse(
+                schedule.getScheduleId(),
+                schedule.getTitle(),
+                schedule.getContent(),
+                schedule.getAuthor(),
+                schedule.getCreatedAt(),
+                schedule.getModifiedAt()
+        );
+
+        return response;
+
     }
 }
