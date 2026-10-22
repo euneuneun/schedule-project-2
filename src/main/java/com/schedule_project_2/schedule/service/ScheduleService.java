@@ -95,4 +95,13 @@ public class ScheduleService {
         return response;
 
     }
+
+    @Transactional
+    public void deletedSchedule(Long scheduleId){
+
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(()-> new IllegalStateException("일정이 존재하지 않습니다"));
+
+        scheduleRepository.delete(schedule);
+    }
 }
