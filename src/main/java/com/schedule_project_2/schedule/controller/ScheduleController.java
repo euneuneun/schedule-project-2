@@ -1,6 +1,7 @@
 package com.schedule_project_2.schedule.controller;
 
 import com.schedule_project_2.schedule.dto.request.ScheduleCreateRequest;
+import com.schedule_project_2.schedule.dto.response.ScheduleListResponse;
 import com.schedule_project_2.schedule.dto.response.ScheduleResponse;
 import com.schedule_project_2.schedule.service.ScheduleService;
 import jakarta.validation.Valid;
@@ -12,7 +13,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RequestMapping("/api/v1/schedules")
 @RestController
@@ -33,6 +37,13 @@ public class ScheduleController {
     public ResponseEntity<ScheduleResponse> getSchedule(@PathVariable Long scheduleId){
 
         ScheduleResponse response = scheduleService.getSchedule(scheduleId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<ScheduleListResponse> getAllSchedule(@RequestParam(required = false) String author){
+        ScheduleListResponse response = scheduleService.getAllSchedule(author);
 
         return ResponseEntity.ok(response);
     }

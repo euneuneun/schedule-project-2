@@ -1,10 +1,14 @@
 package com.schedule_project_2.schedule.service;
 
+import com.schedule_project_2.schedule.dto.response.ScheduleListResponse;
 import com.schedule_project_2.schedule.dto.response.ScheduleResponse;
 import com.schedule_project_2.schedule.entity.Schedule;
 import com.schedule_project_2.schedule.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -40,4 +44,29 @@ public class ScheduleService {
         return response;
     }
 
+    public ScheduleListResponse getAllSchedule(String author){
+        List<Schedule> scheduleList;
+        if(author == null){
+            scheduleList = scheduleRepository.findAllByOrderByModifiedAtDesc();
+        }else{
+            scheduleList = scheduleRepository.findAllByAuthorOrderByModifiedAtDesc(author);
+        }
+
+        List<ScheduleResponse> scheduleListResponse = new ArrayList<>();
+
+        for(Schedule schedule : scheduleList){
+            scheduleListResponse.add(new ScheduleResponse(
+                    schedule.getScheduleId(),
+                    schedule.getTitle(),
+                    schedule.getContent(),
+                    schedule.getAuthor(),
+                    schedule.getCreatedAt(),
+                    schedule.getModifiedAt()
+                    )
+            );
+        }
+        ScheduleListResponse response = new ScheduleListResponse(scheduleListResponse);
+
+        return response;
+    }
 }
