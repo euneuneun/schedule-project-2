@@ -1,6 +1,7 @@
 package com.schedule_project_2.user.controller;
 
 import com.schedule_project_2.user.dto.request.UserCreateRequest;
+import com.schedule_project_2.user.dto.request.UserUpdateRequest;
 import com.schedule_project_2.user.dto.response.UserListResponse;
 import com.schedule_project_2.user.dto.response.UserResponse;
 import com.schedule_project_2.user.service.UserService;
@@ -17,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/users")
@@ -26,10 +25,10 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
-    public ResponseEntity<UserResponse> createUsser(@Valid @RequestBody UserCreateRequest request){
+    @PostMapping("/signup")
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserCreateRequest request){
 
-        UserResponse response = userService.createUser(request.getUsername(),request.getEmail());
+        UserResponse response = userService.createUser(request.getUsername(), request.getEmail(), request.getPassword());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -53,7 +52,7 @@ public class UserController {
     @PatchMapping("/{userId}")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long userId,
-            @Valid @RequestBody UserCreateRequest request){
+            @Valid @RequestBody UserUpdateRequest request){
 
         UserResponse response = userService.updateUser(userId, request.getUsername(), request.getEmail());
 
