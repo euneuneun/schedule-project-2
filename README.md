@@ -268,21 +268,21 @@
 
 |Method|URI|기능|
 |--|--|--|
-|POST|`/api/v1/users`|유저 생성|
+|POST|`/api/v1/users/signup`|회원가입|
 |GET|`/api/v1/users`|유저 전체 조회|
 |GET|`/api/v1/users/{userId}`|유저 단건 조회|
 |PATCH|`/api/v1/users/{userId}`|유저 수정|
 |DELETE|`/api/v1/users/{userId}`|유저 삭제|
 
 <details>
-<summary><h3>유저 생성</h3></summary>
+<summary><h3>회원가입</h3></summary>
 
-유저명과 이메일을 입력받아 새로운 유저를 생성합니다.<br>
+유저명, 이메일, 비밀번호를 입력받아 회원가입합니다.<br>
 이메일은 중복될 수 없으며, 탈퇴한 유저의 이메일로도 가입할 수 없습니다. 작성일과 수정일은 서버에서 자동으로 저장됩니다.
 
 |메서드|요청 URL|
 |--|--|
-|POST|`/api/v1/users`
+|POST|`/api/v1/users/signup`
 
 **Request Headers**
 
@@ -296,11 +296,13 @@
 |--|--|--|--|
 |`username`|String|✅| 유저명 (공백 불가, 최대 20자)|
 |`email`|String|✅| 이메일 (이메일 형식, 최대 255자, 중복 불가)|
+|`password`|String|✅|비밀번호 (공백 불가, 최소 8자)|
 
 ```json
 {
     "username": "홍길동",
-    "email": "gildong@example.com"
+    "email": "gildong@example.com",
+    "password": "password1234"
 }
 ```
 **Response Body** `201 Created`
@@ -327,7 +329,7 @@
 
 |상태 코드|상황|
 |--|--|
-|`400 Bad Request`|입력값 검증 실패 (필수값 누락, 유저명 공백·20자 초과, 이메일 형식 오류·255자 초과)|
+|`400 Bad Request`|입력값 검증 실패 (필수값 누락, 유저명 공백·20자 초과, 이메일 형식 오류·255자 초과, 비밀번호 공백·8자 미만)|
 |`409 Conflict`|이미 사용 중이거나 탈퇴한 유저의 이메일|
 
 </details>
@@ -426,7 +428,8 @@
 <summary><h3>유저 수정</h3></summary>
 
 유저 ID로 특정 유저의 유저명이나 이메일을 수정합니다.<br>
-수정할 필드만 보내면 되고, 최소 1개는 보내야 합니다. 이메일은 다른 유저(탈퇴한 유저 포함)와 중복될 수 없습니다. 수정일은 자동으로 갱신됩니다.
+수정할 필드만 보내면 되고, 최소 1개는 보내야 합니다. 이메일은 다른 유저(탈퇴한 유저 포함)와 중복될 수 없습니다. 수정일은 자동으로 갱신됩니다.<br>
+비밀번호는 이 API로 수정할 수 없습니다.
 
 |메서드|요청 URL|
 |--|--|
@@ -516,6 +519,7 @@ erDiagram
         BIGINT user_id PK
         VARCHAR(20) username
         VARCHAR(255) email UK
+        VARCHAR(255) password 
         TIMESTAMP created_at
         TIMESTAMP modified_at
         TIMESTAMP deleted_at
@@ -560,6 +564,7 @@ erDiagram
 |`user_id`|BIGINT|❌|PK|AUTO_INCREMENT|유저 ID|
 |`username`|VARCHAR(20)|❌|-|-|유저명|
 |`email`|VARCHAR(255)|❌|UNIQUE|-|이메일 (중복 불가)|
+|`password`|VARCHAR(255)|❌|-|-|비밀번호 (추후 암호화 저장 예정)|
 |`created_at`|TIMESTAMP|❌|-|-|작성일 (`BaseEntity` 상속)|
 |`modified_at`|TIMESTAMP|❌|-|-|수정일 (`BaseEntity` 상속)|
 |`deleted_at`|TIMESTAMP|⭕|-|NULL|삭제일 (`BaseEntity` 상속)|
