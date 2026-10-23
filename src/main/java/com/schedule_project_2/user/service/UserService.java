@@ -28,4 +28,19 @@ public class UserService {
 
         return response;
     }
+
+    public UserResponse getUser(Long userId){
+        User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
+                .orElseThrow(()-> new IllegalStateException("존재하지 않는 회원입니다."));
+
+        UserResponse userResponse = new UserResponse(
+                user.getUserId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getCreatedAt(),
+                user.getModifiedAt()
+        );
+
+        return userResponse;
+    }
 }
