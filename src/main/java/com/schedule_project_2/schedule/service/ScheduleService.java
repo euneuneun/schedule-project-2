@@ -4,7 +4,6 @@ import com.schedule_project_2.schedule.dto.response.ScheduleListResponse;
 import com.schedule_project_2.schedule.dto.response.ScheduleResponse;
 import com.schedule_project_2.schedule.entity.Schedule;
 import com.schedule_project_2.schedule.repository.ScheduleRepository;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

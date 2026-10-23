@@ -3,7 +3,6 @@ package com.schedule_project_2.schedule.dto.request;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 public class ScheduleUpdateRequest {
