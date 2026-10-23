@@ -33,4 +33,13 @@ public class User extends BaseEntity {
         this.email = email;
 
     }
+
+    public void update(String username, String email){
+        if(username != null){
+            this.username = username;
+        }
+        if(email != null){
+            this.email = email;
+        }
+    }
 }

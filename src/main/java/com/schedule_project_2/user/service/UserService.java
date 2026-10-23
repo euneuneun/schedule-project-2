@@ -52,7 +52,6 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserListResponse getAllUser(){
-
         List<User> userList = userRepository.findAllByDeletedAtIsNullOrderByCreatedAtDesc();
 
         List<UserResponse> userListResponse = new ArrayList<>();
@@ -69,6 +68,20 @@ public class UserService {
         }
 
         return new UserListResponse(userListResponse);
+    }
 
+    @Transactional
+    public UserResponse updateUser(Long userId, String username, String email){
+        User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
+                .orElseThrow(()-> new IllegalStateException("존재하지 않는 회원입니다."));
+
+        user.update(username, email);
+
+        return new UserResponse(
+                user.getUserId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getCreatedAt(),
+                user.getModifiedAt());
     }
 }

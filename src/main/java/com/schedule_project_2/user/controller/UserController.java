@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,6 +45,16 @@ public class UserController {
     public ResponseEntity<UserListResponse> getAllUser(){
 
         UserListResponse response = userService.getAllUser();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{userId}")
+    public ResponseEntity<UserResponse> updateUser(
+            @PathVariable Long userId,
+            @Valid @RequestBody UserCreateRequest request){
+
+        UserResponse response = userService.updateUser(userId, request.getUsername(), request.getEmail());
 
         return ResponseEntity.ok(response);
     }
