@@ -1,6 +1,7 @@
 package com.schedule_project_2.user.controller;
 
 import com.schedule_project_2.user.dto.request.UserCreateRequest;
+import com.schedule_project_2.user.dto.response.UserListResponse;
 import com.schedule_project_2.user.dto.response.UserResponse;
 import com.schedule_project_2.user.service.UserService;
 import jakarta.validation.Valid;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -29,10 +32,18 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("{/userId}")
+    @GetMapping("/{userId}")
     public ResponseEntity<UserResponse> getUser(@PathVariable Long userId){
 
         UserResponse response = userService.getUser(userId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<UserListResponse> getAllUser(){
+
+        UserListResponse response = userService.getAllUser();
 
         return ResponseEntity.ok(response);
     }
