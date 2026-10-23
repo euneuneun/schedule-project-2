@@ -68,7 +68,7 @@
 |상태 코드|상황|
 |--|--|
 |`400 Bad Request`|입력값 검증 실패 (필수값 누락, 제목·내용 공백, 제목 30자 초과, 내용 200자 초과)|
-|`404 Not Found`|존재하지 않는 유저 ID (`userId`)|
+|`404 Not Found`|존재하지 않거나 삭제된 유저 ID (`userId`)|
 
 </details>
 
@@ -76,7 +76,8 @@
 <summary><h3>일정 전체 조회</h3></summary>
 
 전체 일정을 수정일 기준 내림차순으로 조회합니다.<br>
-작성자 ID(`userId`)를 입력하면 해당 유저의 일정만 조회합니다.
+작성자 ID(`userId`)를 입력하면 해당 유저의 일정만 조회합니다.<br>
+삭제된 일정은 조회되지 않습니다.
 
 |메서드|요청 URL|
 |--|--|
@@ -178,7 +179,7 @@
 
 |상태 코드|상황|
 |--|--|
-|`404 Not Found`|존재하지 않는 일정 ID|
+|`404 Not Found`|존재하지 않거나 삭제된 일정 ID|
 
 </details>
 
@@ -239,14 +240,15 @@
 |--|--|
 |`400 Bad Request`|입력값 검증 실패 (제목·내용 공백, 제목 30자 초과, 내용 200자 초과)|
 |`400 Bad Request`|수정할 필드를 하나도 보내지 않음|
-|`404 Not Found`|존재하지 않는 일정 ID|
+|`404 Not Found`|존재하지 않거나 삭제된 일정 ID|
 
 </details>
 
 <details>
 <summary><h3>일정 삭제</h3></summary>
 
-일정 ID로 특정 일정을 삭제합니다.
+일정 ID로 특정 일정을 삭제합니다.<br>
+실제로 데이터를 지우지 않고 삭제일(`deleted_at`)을 기록하는 soft delete 방식이며, 삭제된 일정은 조회·수정·삭제할 수 없습니다.
 
 |메서드|요청 URL|
 |--|--|
@@ -258,7 +260,7 @@
 
 |상태 코드|상황|
 |--|--|
-|`404 Not Found`|존재하지 않는 일정 ID|
+|`404 Not Found`|존재하지 않거나 삭제된 일정 ID|
 
 </details>
 
@@ -276,7 +278,7 @@
 <summary><h3>유저 생성</h3></summary>
 
 유저명과 이메일을 입력받아 새로운 유저를 생성합니다.<br>
-이메일은 중복될 수 없습니다. 작성일과 수정일은 서버에서 자동으로 저장됩니다.
+이메일은 중복될 수 없으며, 탈퇴한 유저의 이메일로도 가입할 수 없습니다. 작성일과 수정일은 서버에서 자동으로 저장됩니다.
 
 |메서드|요청 URL|
 |--|--|
@@ -326,14 +328,15 @@
 |상태 코드|상황|
 |--|--|
 |`400 Bad Request`|입력값 검증 실패 (필수값 누락, 유저명 공백·20자 초과, 이메일 형식 오류·255자 초과)|
-|`409 Conflict`|이미 사용 중인 이메일|
+|`409 Conflict`|이미 사용 중이거나 탈퇴한 유저의 이메일|
 
 </details>
 
 <details>
 <summary><h3>유저 전체 조회</h3></summary>
 
-전체 유저를 가입일(작성일) 기준 내림차순으로 조회합니다.
+전체 유저를 가입일(작성일) 기준 내림차순으로 조회합니다.<br>
+삭제된 유저는 조회되지 않습니다.
 
 |메서드|요청 URL|
 |--|--|
@@ -415,7 +418,7 @@
 
 |상태 코드|상황|
 |--|--|
-|`404 Not Found`|존재하지 않는 유저 ID|
+|`404 Not Found`|존재하지 않거나 삭제된 유저 ID|
 
 </details>
 
@@ -423,7 +426,7 @@
 <summary><h3>유저 수정</h3></summary>
 
 유저 ID로 특정 유저의 유저명이나 이메일을 수정합니다.<br>
-수정할 필드만 보내면 되고, 최소 1개는 보내야 합니다. 이메일은 다른 유저와 중복될 수 없습니다. 수정일은 자동으로 갱신됩니다.
+수정할 필드만 보내면 되고, 최소 1개는 보내야 합니다. 이메일은 다른 유저(탈퇴한 유저 포함)와 중복될 수 없습니다. 수정일은 자동으로 갱신됩니다.
 
 |메서드|요청 URL|
 |--|--|
@@ -474,15 +477,17 @@
 |--|--|
 |`400 Bad Request`|입력값 검증 실패 (유저명 공백·20자 초과, 이메일 형식 오류·255자 초과)|
 |`400 Bad Request`|수정할 필드를 하나도 보내지 않음|
-|`404 Not Found`|존재하지 않는 유저 ID|
-|`409 Conflict`|다른 유저가 이미 사용 중인 이메일|
+|`404 Not Found`|존재하지 않거나 삭제된 유저 ID|
+|`409 Conflict`|다른 유저(탈퇴한 유저 포함)가 이미 사용 중인 이메일|
 
 </details>
 
 <details>
 <summary><h3>유저 삭제</h3></summary>
 
-유저 ID로 특정 유저를 삭제합니다.
+유저 ID로 특정 유저를 삭제합니다.<br>
+실제로 데이터를 지우지 않고 삭제일(`deleted_at`)을 기록하는 soft delete 방식입니다.<br>
+해당 유저가 작성한 일정도 함께 삭제(soft delete)되며, 탈퇴한 유저의 이메일로는 다시 가입할 수 없습니다.
 
 |메서드|요청 URL|
 |--|--|
@@ -494,7 +499,7 @@
 
 |상태 코드|상황|
 |--|--|
-|`404 Not Found`|존재하지 않는 유저 ID|
+|`404 Not Found`|존재하지 않거나 삭제된 유저 ID|
 
 </details>
 
@@ -513,6 +518,7 @@ erDiagram
         VARCHAR(255) email UK
         TIMESTAMP created_at
         TIMESTAMP modified_at
+        TIMESTAMP deleted_at
     }
 
     schedules {
@@ -522,6 +528,7 @@ erDiagram
         VARCHAR(200) content
         TIMESTAMP created_at
         TIMESTAMP modified_at
+        TIMESTAMP deleted_at
     }
 ```
 
@@ -533,6 +540,7 @@ erDiagram
 |--|--|--|--|--|--|
 |`created_at`|TIMESTAMP|❌|-|-|작성일 (최초 저장 시 자동 입력, 수정 불가)|
 |`modified_at`|TIMESTAMP|❌|-|-|수정일 (저장·수정 시 자동 갱신)|
+|`deleted_at`|TIMESTAMP|⭕|-|NULL|삭제일 (삭제 시 기록, NULL이면 삭제되지 않은 상태)|
 
 ### 테이블명: `schedules`
 |칼럼 이름| 데이터타입|null 허용| key종류| 기본값| 설명|
@@ -543,6 +551,7 @@ erDiagram
 |`content`|VARCHAR(200)|❌|-|-|할일 내용|
 |`created_at`|TIMESTAMP|❌|-|-|작성일 (`BaseEntity` 상속)|
 |`modified_at`|TIMESTAMP|❌|-|-|수정일 (`BaseEntity` 상속)|
+|`deleted_at`|TIMESTAMP|⭕|-|NULL|삭제일 (`BaseEntity` 상속)|
 
 ### 테이블명: `users`
 
@@ -553,3 +562,4 @@ erDiagram
 |`email`|VARCHAR(255)|❌|UNIQUE|-|이메일 (중복 불가)|
 |`created_at`|TIMESTAMP|❌|-|-|작성일 (`BaseEntity` 상속)|
 |`modified_at`|TIMESTAMP|❌|-|-|수정일 (`BaseEntity` 상속)|
+|`deleted_at`|TIMESTAMP|⭕|-|NULL|삭제일 (`BaseEntity` 상속)|
