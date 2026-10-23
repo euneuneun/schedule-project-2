@@ -33,7 +33,7 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public ScheduleResponse getSchedule(Long scheduleId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
+        Schedule schedule = scheduleRepository.findByScheduleIdAndDeletedAtIsNull(scheduleId)
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 일정입니다."));
 
         ScheduleResponse response = new ScheduleResponse(
@@ -51,9 +51,9 @@ public class ScheduleService {
     public ScheduleListResponse getAllSchedule(String author){
         List<Schedule> scheduleList;
         if(author == null){
-            scheduleList = scheduleRepository.findAllByOrderByModifiedAtDesc();
+            scheduleList = scheduleRepository.findAllByDeletedAtIsNullOrderByModifiedAtDesc();
         }else{
-            scheduleList = scheduleRepository.findAllByAuthorOrderByModifiedAtDesc(author);
+            scheduleList = scheduleRepository.findAllByAuthorAndDeletedAtIsNullOrderByModifiedAtDesc(author);
         }
 
         List<ScheduleResponse> scheduleListResponse = new ArrayList<>();
@@ -77,7 +77,7 @@ public class ScheduleService {
     @Transactional
     public ScheduleResponse updateSchedule(Long scheduleId, String title, String content) {
 
-        Schedule schedule = scheduleRepository.findById(scheduleId)
+        Schedule schedule = scheduleRepository.findByScheduleIdAndDeletedAtIsNull(scheduleId)
                         .orElseThrow(()-> new IllegalStateException("일정이 존재하지 않습니다."));
 
         schedule.updateSchedule(title, content);
@@ -98,9 +98,9 @@ public class ScheduleService {
     @Transactional
     public void deletedSchedule(Long scheduleId){
 
-        Schedule schedule = scheduleRepository.findById(scheduleId)
+        Schedule schedule = scheduleRepository.findByScheduleIdAndDeletedAtIsNull(scheduleId)
                 .orElseThrow(()-> new IllegalStateException("일정이 존재하지 않습니다"));
 
-        scheduleRepository.delete(schedule);
+        schedule.delete();
     }
 }
