@@ -1,3 +1,17 @@
 spring:
   application:
     name: schedule_project_2
+
+  config:
+    import: optional:file:.env[.properties]
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/schedule?createDatabaseIfNotExist=true&serverTimezone=Asia/Seoul
+    username: root
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
