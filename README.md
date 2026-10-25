@@ -1,5 +1,95 @@
 ## API 명세서
 
+### 인증 방식
+
+Cookie/Session 방식으로 인증합니다.
+
+- 로그인에 성공하면 서버가 `Set-Cookie` 헤더로 세션 ID(`JSESSIONID`)를 발급합니다.
+- 🔒 표시된 API는 `Cookie` 헤더에 세션 ID를 담아 요청해야 합니다. (브라우저·Postman은 자동으로 보냅니다)
+- 세션은 마지막 요청 후 30분이 지나거나 로그아웃하면 만료됩니다.
+- 세션이 없거나 만료된 상태로 🔒 API를 호출하면 `401 Unauthorized`를 반환합니다.
+
+### 인증(auth)
+
+|Method|URI|기능|로그인|
+|--|--|--|--|
+|POST|`api/v1/auth/login`|로그인|-|
+|POST|`api/v1/auth/logout`|로그아웃|🔒|
+
+<details>
+<summary><h3>로그인</h3></summary>
+
+이메일과 비밀번호로 로그인합니다.<br>
+로그인에 성공하면 서버에 세션이 생성되고, 세션 ID가 쿠키(`JSESSIONID`)로 발급됩니다. <br>
+탈퇴한 유저는 로그인할 수 없습니다.
+
+|메서드|요청 URL|
+|--|--|
+|POST|`/api/v1/auth/login`
+
+**Request Headers**
+
+|Key|Value|필수|설명|
+|--|--|--|--|
+|`Content-Type`|`application/json`|✅|요청 본문 형식|
+
+**Request Body**
+
+|필드|타입|필수|설명|
+|--|--|--|--|
+|`email`|String|✅|이메일 (이메일 형식)|
+|`password`|String|✅|비밀번호|
+
+```json
+{
+    "email": "gildong@example.com",
+    "password": "password1234"
+}
+```
+
+**Response** `200 OK` (응답 바디 없음)
+
+**Response Headers**
+
+|Key|Value|설명|
+|--|--|--|
+|`Set-Cookie`|`JESSIONID={세션ID}; Path=/; HttpOnly`|로그인 세션 ID|
+
+**Error Response**
+
+|상태 코드|상황|
+|--|--|
+|`400 Bad Request`|입력값 검증 실패 (필수값 누락, 이메일 형식 오류)|
+|`401 Unauthorized`|이메일 또는 비밀번호 불일치 (탈퇴한 유저 포함)|
+
+<details>
+<summary><h3>로그아웃</h3></summary>
+
+현재 로그인 세션을 서버에서 무효화합니다.<br>
+로그아웃 후에는 이전 세션 ID로 요청해도 로그인 상태로 처리되지 않습니다.
+
+|메서드|요청 URL|
+|--|--|
+|POST|`/api/v1/auth/logout`
+
+**Request Headers**
+
+|Key|Value|필수|설명|
+|--|--|--|--|
+|`Cookie`|`JSESSIONID={세션 ID}`|✅|로그인 세션 ID|
+
+**Response** `204 No Content`
+
+**Error Response**
+
+|상태 코드|상황|
+|--|--|
+|`401 Unauthorized`|로그인하지 않았거나 이미 만료된 세션|
+
+</details>
+
+</details>
+
 ### 일정(schedule)
 
 |Method|URI|기능|
