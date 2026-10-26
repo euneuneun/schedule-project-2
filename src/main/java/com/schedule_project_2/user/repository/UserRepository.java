@@ -17,4 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // SELECT * FROM users WHERE email = ? AND deleted_at IS NULL;
     Optional<User> findByEmailAndDeletedAtIsNull(String email);
 
+    // SELECT EXISTS(SELECT 1 FROM users WHERE email = ?);
+    boolean existsByEmail(String email);
+
 }

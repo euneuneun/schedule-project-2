@@ -19,6 +19,9 @@ public class UserService {
 
     @Transactional
     public UserResponse createUser(String username, String email, String password){
+        if(userRepository.existsByEmail(email))
+            throw new IllegalStateException("존재하는 이메일 입니다.");
+
         User user = new User(username, email, password);
 
         User saveUser = userRepository.save(user);
