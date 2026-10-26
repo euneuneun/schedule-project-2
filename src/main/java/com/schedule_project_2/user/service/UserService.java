@@ -74,11 +74,15 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse updateUser(Long userId, String username, String email){
+    public UserResponse updateUser(Long userId, Long loginUserId, String username){
+        if(!userId.equals(loginUserId)){
+            throw new IllegalStateException("본인의 정보만 수정할 수 있습니다.");
+        }
+
         User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
                 .orElseThrow(()-> new IllegalStateException("존재하지 않는 회원입니다."));
 
-        user.update(username, email);
+        user.update(username);
 
         return new UserResponse(
                 user.getUserId(),
@@ -89,7 +93,10 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(Long userId){
+    public void deleteUser(Long userId, Long loginUserId){
+        if(!userId.equals(loginUserId)){
+            throw new IllegalStateException("본인만 탈퇴할 수 있습니다.");
+        }
 
         User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
                 .orElseThrow(()-> new IllegalStateException("존재하지 않는 회원입니다."));

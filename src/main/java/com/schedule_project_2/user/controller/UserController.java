@@ -1,5 +1,6 @@
 package com.schedule_project_2.user.controller;
 
+import com.schedule_project_2.common.SessionConst;
 import com.schedule_project_2.user.dto.request.UserCreateRequest;
 import com.schedule_project_2.user.dto.request.UserUpdateRequest;
 import com.schedule_project_2.user.dto.response.UserListResponse;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 @RequiredArgsConstructor
 @RestController
@@ -51,18 +53,21 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public ResponseEntity<UserResponse> updateUser(
+            @SessionAttribute(name = SessionConst.LOGIN_USER) Long loginUserId,
             @PathVariable Long userId,
             @Valid @RequestBody UserUpdateRequest request){
 
-        UserResponse response = userService.updateUser(userId, request.getUsername(), request.getEmail());
+        UserResponse response = userService.updateUser(userId, loginUserId, request.getUsername());
 
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long userId){
+    public ResponseEntity<Void> deleteUser(
+            @SessionAttribute(name = SessionConst.LOGIN_USER) Long loginUserId,
+            @PathVariable Long userId){
 
-        userService.deleteUser(userId);
+        userService.deleteUser(userId, loginUserId);
 
         return ResponseEntity.noContent().build();
     }
