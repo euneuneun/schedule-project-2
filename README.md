@@ -13,8 +13,8 @@ Cookie/Session 방식으로 인증합니다.
 
 |Method|URI|기능|로그인|
 |--|--|--|--|
-|POST|`api/v1/auth/login`|로그인|-|
-|POST|`api/v1/auth/logout`|로그아웃|🔒|
+|POST|`/api/v1/auth/login`|로그인|-|
+|POST|`/api/v1/auth/logout`|로그아웃|🔒|
 
 <details>
 <summary><h3>로그인</h3></summary>
@@ -53,7 +53,7 @@ Cookie/Session 방식으로 인증합니다.
 
 |Key|Value|설명|
 |--|--|--|
-|`Set-Cookie`|`JESSIONID={세션ID}; Path=/; HttpOnly`|로그인 세션 ID|
+|`Set-Cookie`|`JSESSIONID={세션 ID}; Path=/; HttpOnly`|로그인 세션 ID|
 
 **Error Response**
 
@@ -61,6 +61,8 @@ Cookie/Session 방식으로 인증합니다.
 |--|--|
 |`400 Bad Request`|입력값 검증 실패 (필수값 누락, 이메일 형식 오류)|
 |`401 Unauthorized`|이메일 또는 비밀번호 불일치 (탈퇴한 유저 포함)|
+
+</details>
 
 <details>
 <summary><h3>로그아웃</h3></summary>
@@ -88,22 +90,20 @@ Cookie/Session 방식으로 인증합니다.
 
 </details>
 
-</details>
-
 ### 일정(schedule)
 
-|Method|URI|기능|
-|--|--|--|
-|POST|`/api/v1/schedules`|일정 생성|
-|GET|`/api/v1/schedules`|일정 전체 조회|
-|GET|`/api/v1/schedules/{scheduleId}`|일정 단건 조회|
-|PATCH|`/api/v1/schedules/{scheduleId}`|일정 수정|
-|DELETE|`/api/v1/schedules/{scheduleId}`|일정 삭제|
+|Method|URI|기능|로그인|
+|--|--|--|--|
+|POST|`/api/v1/schedules`|일정 생성|🔒|
+|GET|`/api/v1/schedules`|일정 전체 조회|🔒|
+|GET|`/api/v1/schedules/{scheduleId}`|일정 단건 조회|🔒|
+|PATCH|`/api/v1/schedules/{scheduleId}`|일정 수정|🔒|
+|DELETE|`/api/v1/schedules/{scheduleId}`|일정 삭제|🔒|
 
 <details>
 <summary><h3>일정 생성</h3></summary>
 
-할일 제목, 할일 내용, 작성자 ID를 입력받아 새로운 일정을 생성합니다.<br>
+할일 제목, 할일 내용을 입력받아 일정을 생성합니다. 작성자는 로그인한 유저로 자동 지정됩니다.<br>
 작성일과 수정일은 서버에서 자동으로 저장됩니다.
 
 |메서드|요청 URL|
@@ -115,6 +115,7 @@ Cookie/Session 방식으로 인증합니다.
 |Key|Value|필수|설명|
 |--|--|--|--|
 |`Content-Type`|`application/json`|✅|요청 본문 형식|
+|`Cookie`|`JSESSIONID={세션 ID}`|✅|로그인 세션 ID|
 
 **Request Body**
 
@@ -122,13 +123,11 @@ Cookie/Session 방식으로 인증합니다.
 |--|--|--|--|
 |`title`|String|✅| 할일 제목 (공백 불가, 최대 30자)|
 |`content`|String|✅| 할일 내용 (공백 불가, 최대 200자)|
-|`userId`|Long|✅| 작성자 ID (존재하는 유저여야 함)|
 
 ```json
 {
     "title": "할일 제목",
     "content": "할일 내용",
-    "userId": 1
 }
 ```
 **Response Body** `201 Created`
@@ -158,7 +157,7 @@ Cookie/Session 방식으로 인증합니다.
 |상태 코드|상황|
 |--|--|
 |`400 Bad Request`|입력값 검증 실패 (필수값 누락, 제목·내용 공백, 제목 30자 초과, 내용 200자 초과)|
-|`404 Not Found`|존재하지 않거나 삭제된 유저 ID (`userId`)|
+|`401 Unauthorized`|로그인하지 않았거나 세션이 만료된 경우|
 
 </details>
 
@@ -172,6 +171,12 @@ Cookie/Session 방식으로 인증합니다.
 |메서드|요청 URL|
 |--|--|
 |GET|`/api/v1/schedules`
+
+**Request Headers**
+
+|Key|Value|필수|설명|
+|--|--|--|--|
+|`Cookie`|`JSESSIONID={세션 ID}`|✅|로그인 세션 ID|
 
 **Query Parameter**
 
@@ -232,6 +237,12 @@ Cookie/Session 방식으로 인증합니다.
 }
 ```
 
+**Error Response**
+
+|상태 코드|상황|
+|--|--|
+|`401 Unauthorized`|로그인하지 않았거나 세션이 만료된 경우|
+
 </details>
 
 <details>
@@ -242,6 +253,12 @@ Cookie/Session 방식으로 인증합니다.
 |메서드|요청 URL|
 |--|--|
 |GET|`/api/v1/schedules/{scheduleId}`
+
+**Request Headers**
+
+|Key|Value|필수|설명|
+|--|--|--|--|
+|`Cookie`|`JSESSIONID={세션 ID}`|✅|로그인 세션 ID|
 
 **Response Body** `200 OK`
 
@@ -269,6 +286,7 @@ Cookie/Session 방식으로 인증합니다.
 
 |상태 코드|상황|
 |--|--|
+|`401 Unauthorized`|로그인하지 않았거나 세션이 만료된 경우|
 |`404 Not Found`|존재하지 않거나 삭제된 일정 ID|
 
 </details>
@@ -288,6 +306,7 @@ Cookie/Session 방식으로 인증합니다.
 |Key|Value|필수|설명|
 |--|--|--|--|
 |`Content-Type`|`application/json`|✅|요청 본문 형식|
+|`Cookie`|`JSESSIONID={세션 ID}`|✅|로그인 세션 ID|
 
 **Request Body**
 
@@ -330,6 +349,7 @@ Cookie/Session 방식으로 인증합니다.
 |--|--|
 |`400 Bad Request`|입력값 검증 실패 (제목·내용 공백, 제목 30자 초과, 내용 200자 초과)|
 |`400 Bad Request`|수정할 필드를 하나도 보내지 않음|
+|`401 Unauthorized`|로그인하지 않았거나 세션이 만료된 경우|
 |`404 Not Found`|존재하지 않거나 삭제된 일정 ID|
 
 </details>
@@ -344,25 +364,32 @@ Cookie/Session 방식으로 인증합니다.
 |--|--|
 |DELETE|`/api/v1/schedules/{scheduleId}`
 
+**Request Headers**
+
+|Key|Value|필수|설명|
+|--|--|--|--|
+|`Cookie`|`JSESSIONID={세션 ID}`|✅|로그인 세션 ID|
+
 **Response** `204 No Content`
 
 **Error Response**
 
 |상태 코드|상황|
 |--|--|
+|`401 Unauthorized`|로그인하지 않았거나 세션이 만료된 경우|
 |`404 Not Found`|존재하지 않거나 삭제된 일정 ID|
 
 </details>
 
 ### 유저(user)
 
-|Method|URI|기능|
-|--|--|--|
-|POST|`/api/v1/users/signup`|회원가입|
-|GET|`/api/v1/users`|유저 전체 조회|
-|GET|`/api/v1/users/{userId}`|유저 단건 조회|
-|PATCH|`/api/v1/users/{userId}`|유저 수정|
-|DELETE|`/api/v1/users/{userId}`|유저 삭제|
+|Method|URI|기능|로그인|
+|--|--|--|--|
+|POST|`/api/v1/users/signup`|회원가입|-|
+|GET|`/api/v1/users`|유저 전체 조회|🔒|
+|GET|`/api/v1/users/{userId}`|유저 단건 조회|🔒|
+|PATCH|`/api/v1/users/{userId}`|유저 수정|🔒|
+|DELETE|`/api/v1/users/{userId}`|유저 삭제|🔒|
 
 <details>
 <summary><h3>회원가입</h3></summary>
@@ -434,6 +461,12 @@ Cookie/Session 방식으로 인증합니다.
 |--|--|
 |GET|`/api/v1/users`
 
+**Request Headers**
+
+|Key|Value|필수|설명|
+|--|--|--|--|
+|`Cookie`|`JSESSIONID={세션 ID}`|✅|로그인 세션 ID|
+
 **Response Body** `200 OK`
 
 > 가입일(`createdAt`) 기준 내림차순 정렬
@@ -475,6 +508,12 @@ Cookie/Session 방식으로 인증합니다.
 }
 ```
 
+**Error Response**
+
+|상태 코드|상황|
+|--|--|
+|`401 Unauthorized`|로그인하지 않았거나 세션이 만료된 경우|
+
 </details>
 
 <details>
@@ -485,6 +524,12 @@ Cookie/Session 방식으로 인증합니다.
 |메서드|요청 URL|
 |--|--|
 |GET|`/api/v1/users/{userId}`
+
+**Request Headers**
+
+|Key|Value|필수|설명|
+|--|--|--|--|
+|`Cookie`|`JSESSIONID={세션 ID}`|✅|로그인 세션 ID|
 
 **Response Body** `200 OK`
 
@@ -510,6 +555,7 @@ Cookie/Session 방식으로 인증합니다.
 
 |상태 코드|상황|
 |--|--|
+|`401 Unauthorized`|로그인하지 않았거나 세션이 만료된 경우|
 |`404 Not Found`|존재하지 않거나 삭제된 유저 ID|
 
 </details>
@@ -530,6 +576,7 @@ Cookie/Session 방식으로 인증합니다.
 |Key|Value|필수|설명|
 |--|--|--|--|
 |`Content-Type`|`application/json`|✅|요청 본문 형식|
+|`Cookie`|`JSESSIONID={세션 ID}`|✅|로그인 세션 ID|
 
 **Request Body**
 
@@ -570,6 +617,7 @@ Cookie/Session 방식으로 인증합니다.
 |--|--|
 |`400 Bad Request`|입력값 검증 실패 (유저명 공백·20자 초과, 이메일 형식 오류·255자 초과)|
 |`400 Bad Request`|수정할 필드를 하나도 보내지 않음|
+|`401 Unauthorized`|로그인하지 않았거나 세션이 만료된 경우|
 |`404 Not Found`|존재하지 않거나 삭제된 유저 ID|
 |`409 Conflict`|다른 유저(탈퇴한 유저 포함)가 이미 사용 중인 이메일|
 
@@ -580,11 +628,18 @@ Cookie/Session 방식으로 인증합니다.
 
 유저 ID로 특정 유저를 삭제합니다.<br>
 실제로 데이터를 지우지 않고 삭제일(`deleted_at`)을 기록하는 soft delete 방식입니다.<br>
-해당 유저가 작성한 일정도 함께 삭제(soft delete)되며, 탈퇴한 유저의 이메일로는 다시 가입할 수 없습니다.
+해당 유저가 작성한 일정도 함께 삭제(soft delete)되며, 탈퇴한 유저의 이메일로는 다시 가입할 수 없습니다.<br>
+탈퇴하면 현재 로그인 세션도 함께 만료됩니다.
 
 |메서드|요청 URL|
 |--|--|
 |DELETE|`/api/v1/users/{userId}`
+
+**Request Headers**
+
+|Key|Value|필수|설명|
+|--|--|--|--|
+|`Cookie`|`JSESSIONID={세션 ID}`|✅|로그인 세션 ID|
 
 **Response** `204 No Content`
 
@@ -592,6 +647,7 @@ Cookie/Session 방식으로 인증합니다.
 
 |상태 코드|상황|
 |--|--|
+|`401 Unauthorized`|로그인하지 않았거나 세션이 만료된 경우|
 |`404 Not Found`|존재하지 않거나 삭제된 유저 ID|
 
 </details>
