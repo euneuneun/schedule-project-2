@@ -1,6 +1,8 @@
 package com.schedule_project_2.common.interceptor;
 
 import com.schedule_project_2.common.SessionConst;
+import com.schedule_project_2.common.exception.BusinessException;
+import com.schedule_project_2.common.exception.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -13,7 +15,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession(false);
 
         if(session == null || session.getAttribute(SessionConst.LOGIN_USER) == null){
-            throw new IllegalStateException("로그인이 필요합니다.");
+            throw new BusinessException(ErrorCode.LOGIN_REQUIRED);
         }
         return true;
     }

@@ -1,5 +1,7 @@
 package com.schedule_project_2.schedule.service;
 
+import com.schedule_project_2.common.exception.BusinessException;
+import com.schedule_project_2.common.exception.ErrorCode;
 import com.schedule_project_2.schedule.dto.response.ScheduleListResponse;
 import com.schedule_project_2.schedule.dto.response.ScheduleResponse;
 import com.schedule_project_2.schedule.entity.Schedule;
@@ -23,7 +25,7 @@ public class ScheduleService {
     @Transactional
     public ScheduleResponse createSchedule(String title, String content, Long userId){
         User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
-                .orElseThrow(()-> new IllegalStateException("존재하지 않는 회원입니다."));
+                .orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Schedule schedule = new Schedule(title, content, user);
         Schedule saveSchedule = scheduleRepository.save(schedule);
@@ -40,7 +42,7 @@ public class ScheduleService {
     @Transactional(readOnly = true)
     public ScheduleResponse getSchedule(Long scheduleId) {
         Schedule schedule = scheduleRepository.findByScheduleIdAndDeletedAtIsNull(scheduleId)
-                .orElseThrow(() -> new IllegalStateException("존재하지 않는 일정입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.SCHEDULE_NOT_FOUND));
 
         ScheduleResponse response = new ScheduleResponse(
                 schedule.getScheduleId(),
@@ -84,10 +86,10 @@ public class ScheduleService {
     public ScheduleResponse updateSchedule(Long scheduleId, Long loginUserId, String title, String content) {
 
         Schedule schedule = scheduleRepository.findByScheduleIdAndDeletedAtIsNull(scheduleId)
-                        .orElseThrow(()-> new IllegalStateException("일정이 존재하지 않습니다."));
+                        .orElseThrow(()-> new BusinessException(ErrorCode.SCHEDULE_NOT_FOUND));
 
         if(!schedule.getUser().getUserId().equals(loginUserId)){
-            throw new IllegalStateException("본인이 작성한 일정만 수정할 수 있습니다.");
+            throw new BusinessException(ErrorCode.SCHEDULE_FORBIDDEN);
         }
 
         schedule.updateSchedule(title, content);
@@ -109,10 +111,10 @@ public class ScheduleService {
     public void deletedSchedule(Long scheduleId, Long loginUserId){
 
         Schedule schedule = scheduleRepository.findByScheduleIdAndDeletedAtIsNull(scheduleId)
-                .orElseThrow(()-> new IllegalStateException("일정이 존재하지 않습니다"));
+                .orElseThrow(()-> new BusinessException(ErrorCode.SCHEDULE_NOT_FOUND));
 
         if(!schedule.getUser().getUserId().equals(loginUserId)){
-            throw new IllegalStateException("본인이 작성한 일정만 삭제할 수 있습니다.");
+            throw new BusinessException(ErrorCode.SCHEDULE_FORBIDDEN);
         }
 
         schedule.delete();

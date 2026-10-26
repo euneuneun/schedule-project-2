@@ -1,5 +1,7 @@
 package com.schedule_project_2.user.service;
 
+import com.schedule_project_2.common.exception.BusinessException;
+import com.schedule_project_2.common.exception.ErrorCode;
 import com.schedule_project_2.schedule.entity.Schedule;
 import com.schedule_project_2.schedule.repository.ScheduleRepository;
 import com.schedule_project_2.user.dto.response.UserListResponse;
@@ -23,7 +25,7 @@ public class UserService {
     @Transactional
     public UserResponse createUser(String username, String email, String password){
         if(userRepository.existsByEmail(email))
-            throw new IllegalStateException("존재하는 이메일 입니다.");
+            throw new BusinessException(ErrorCode.DUPLICATE_EMAIL);
 
         User user = new User(username, email, password);
 
@@ -43,7 +45,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResponse getUser(Long userId){
         User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
-                .orElseThrow(()-> new IllegalStateException("존재하지 않는 회원입니다."));
+                .orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         UserResponse userResponse = new UserResponse(
                 user.getUserId(),
@@ -79,11 +81,11 @@ public class UserService {
     @Transactional
     public UserResponse updateUser(Long userId, Long loginUserId, String username){
         if(!userId.equals(loginUserId)){
-            throw new IllegalStateException("본인의 정보만 수정할 수 있습니다.");
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
         }
 
         User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
-                .orElseThrow(()-> new IllegalStateException("존재하지 않는 회원입니다."));
+                .orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         user.update(username);
 
@@ -98,11 +100,11 @@ public class UserService {
     @Transactional
     public void deleteUser(Long userId, Long loginUserId){
         if(!userId.equals(loginUserId)){
-            throw new IllegalStateException("본인만 탈퇴할 수 있습니다.");
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
         }
 
         User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
-                .orElseThrow(()-> new IllegalStateException("존재하지 않는 회원입니다."));
+                .orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         List<Schedule> scheduleList = scheduleRepository.findAllByUser_UserIdAndDeletedAtIsNullOrderByModifiedAtDesc(userId);
         for(Schedule schedule : scheduleList){
