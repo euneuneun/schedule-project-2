@@ -6,6 +6,8 @@ import com.schedule_project_2.user.dto.request.UserUpdateRequest;
 import com.schedule_project_2.user.dto.response.UserListResponse;
 import com.schedule_project_2.user.dto.response.UserResponse;
 import com.schedule_project_2.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -65,9 +67,15 @@ public class UserController {
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(
             @SessionAttribute(name = SessionConst.LOGIN_USER) Long loginUserId,
-            @PathVariable Long userId){
+            @PathVariable Long userId,
+            HttpServletRequest httpRequest){
 
         userService.deleteUser(userId, loginUserId);
+
+        HttpSession session = httpRequest.getSession(false);
+        if(session != null){
+            session.invalidate();
+        }
 
         return ResponseEntity.noContent().build();
     }

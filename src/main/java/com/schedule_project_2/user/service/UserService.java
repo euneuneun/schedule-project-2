@@ -1,5 +1,7 @@
 package com.schedule_project_2.user.service;
 
+import com.schedule_project_2.schedule.entity.Schedule;
+import com.schedule_project_2.schedule.repository.ScheduleRepository;
 import com.schedule_project_2.user.dto.response.UserListResponse;
 import com.schedule_project_2.user.dto.response.UserResponse;
 import com.schedule_project_2.user.entity.User;
@@ -16,6 +18,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final ScheduleRepository scheduleRepository;
 
     @Transactional
     public UserResponse createUser(String username, String email, String password){
@@ -100,6 +103,11 @@ public class UserService {
 
         User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
                 .orElseThrow(()-> new IllegalStateException("존재하지 않는 회원입니다."));
+
+        List<Schedule> scheduleList = scheduleRepository.findAllByUser_UserIdAndDeletedAtIsNullOrderByModifiedAtDesc(userId);
+        for(Schedule schedule : scheduleList){
+            schedule.delete();
+        }
 
         user.delete();
     }
