@@ -10,17 +10,17 @@ import java.time.LocalDateTime;
 public class ScheduleResponse {
 
     private Long scheduleId;
+    private Long userId;
     private String title;
     private String content;
-    private String author;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
-    public ScheduleResponse(Long scheduleId, String title, String content, String author, LocalDateTime createdAt, LocalDateTime modifiedAt){
+    public ScheduleResponse(Long scheduleId, Long userId, String title, String content, LocalDateTime createdAt, LocalDateTime modifiedAt){
         this.scheduleId = scheduleId;
+        this.userId = userId;
         this.title = title;
         this. content = content;
-        this.author = author;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
     }

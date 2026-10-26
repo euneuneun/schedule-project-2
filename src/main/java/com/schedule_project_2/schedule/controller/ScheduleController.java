@@ -1,5 +1,6 @@
 package com.schedule_project_2.schedule.controller;
 
+import com.schedule_project_2.common.SessionConst;
 import com.schedule_project_2.schedule.dto.request.ScheduleCreateRequest;
 import com.schedule_project_2.schedule.dto.request.ScheduleUpdateRequest;
 import com.schedule_project_2.schedule.dto.response.ScheduleListResponse;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 
 @RequestMapping("/api/v1/schedules")
@@ -28,9 +30,11 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @PostMapping
-    public ResponseEntity<ScheduleResponse> createSchedule(@Valid @RequestBody ScheduleCreateRequest request){
+    public ResponseEntity<ScheduleResponse> createSchedule(
+            @SessionAttribute(name = SessionConst.LOGIN_USER) Long loginUserId,
+            @Valid @RequestBody ScheduleCreateRequest request){
 
-        ScheduleResponse response = scheduleService.createSchedule(request.getTitle(), request.getContent(), request.getAuthor());
+        ScheduleResponse response = scheduleService.createSchedule(request.getTitle(), request.getContent(), loginUserId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -44,9 +48,9 @@ public class ScheduleController {
     }
 
     @GetMapping
-    public ResponseEntity<ScheduleListResponse> getAllSchedule(@RequestParam(required = false) String author){
+    public ResponseEntity<ScheduleListResponse> getAllSchedule(@RequestParam(required = false) Long userId){
 
-        ScheduleListResponse response = scheduleService.getAllSchedule(author);
+        ScheduleListResponse response = scheduleService.getAllSchedule(userId);
 
         return ResponseEntity.ok(response);
     }

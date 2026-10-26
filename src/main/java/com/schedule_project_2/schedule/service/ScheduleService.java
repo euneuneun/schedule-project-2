@@ -4,6 +4,8 @@ import com.schedule_project_2.schedule.dto.response.ScheduleListResponse;
 import com.schedule_project_2.schedule.dto.response.ScheduleResponse;
 import com.schedule_project_2.schedule.entity.Schedule;
 import com.schedule_project_2.schedule.repository.ScheduleRepository;
+import com.schedule_project_2.user.entity.User;
+import com.schedule_project_2.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,16 +18,20 @@ import java.util.List;
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
+    private final UserRepository userRepository;
 
     @Transactional
-    public ScheduleResponse createSchedule(String title, String content, String author){
-        Schedule schedule = new Schedule(title,content, author);
+    public ScheduleResponse createSchedule(String title, String content, Long userId){
+        User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
+                .orElseThrow(()-> new IllegalStateException("존재하지 않는 회원입니다."));
+
+        Schedule schedule = new Schedule(title, content, user);
         Schedule saveSchedule = scheduleRepository.save(schedule);
         ScheduleResponse response = new ScheduleResponse(
                 saveSchedule.getScheduleId(),
+                saveSchedule.getUser().getUserId(),
                 saveSchedule.getTitle(),
                 saveSchedule.getContent(),
-                saveSchedule.getAuthor(),
                 saveSchedule.getCreatedAt(),
                 saveSchedule.getModifiedAt());
         return response;
@@ -38,9 +44,9 @@ public class ScheduleService {
 
         ScheduleResponse response = new ScheduleResponse(
                 schedule.getScheduleId(),
+                schedule.getUser().getUserId(),
                 schedule.getTitle(),
                 schedule.getContent(),
-                schedule.getAuthor(),
                 schedule.getCreatedAt(),
                 schedule.getModifiedAt());
 
@@ -48,12 +54,12 @@ public class ScheduleService {
     }
 
     @Transactional(readOnly = true)
-    public ScheduleListResponse getAllSchedule(String author){
+    public ScheduleListResponse getAllSchedule(Long userId){
         List<Schedule> scheduleList;
-        if(author == null){
+        if(userId == null){
             scheduleList = scheduleRepository.findAllByDeletedAtIsNullOrderByModifiedAtDesc();
         }else{
-            scheduleList = scheduleRepository.findAllByAuthorAndDeletedAtIsNullOrderByModifiedAtDesc(author);
+            scheduleList = scheduleRepository.findAllByUser_UserIdAndDeletedAtIsNullOrderByModifiedAtDesc(userId);
         }
 
         List<ScheduleResponse> scheduleListResponse = new ArrayList<>();
@@ -61,9 +67,9 @@ public class ScheduleService {
         for(Schedule schedule : scheduleList){
             scheduleListResponse.add(new ScheduleResponse(
                     schedule.getScheduleId(),
+                    schedule.getUser().getUserId(),
                     schedule.getTitle(),
                     schedule.getContent(),
-                    schedule.getAuthor(),
                     schedule.getCreatedAt(),
                     schedule.getModifiedAt()
                     )
@@ -84,9 +90,9 @@ public class ScheduleService {
 
         ScheduleResponse response = new ScheduleResponse(
                 schedule.getScheduleId(),
+                schedule.getUser().getUserId(),
                 schedule.getTitle(),
                 schedule.getContent(),
-                schedule.getAuthor(),
                 schedule.getCreatedAt(),
                 schedule.getModifiedAt()
         );

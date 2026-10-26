@@ -1,11 +1,15 @@
 package com.schedule_project_2.schedule.entity;
 
 import com.schedule_project_2.common.BaseEntity;
+import com.schedule_project_2.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,19 +25,20 @@ public class Schedule extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long scheduleId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id", nullable = false)
+    private User user;
+
     @Column(nullable = false, length = 30)
     private String title;
 
     @Column(nullable = false, length = 200)
     private String content;
 
-    @Column(nullable = false, length = 50)
-    private String author;
-
-    public Schedule(String title, String content, String author){
+    public Schedule(String title, String content, User user){
         this.title = title;
         this.content = content;
-        this.author = author;
+        this.user = user;
     }
 
     public void updateSchedule(String title, String content){

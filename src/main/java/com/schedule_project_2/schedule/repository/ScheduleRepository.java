@@ -11,8 +11,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
     // SELECT * FROM schedules WHERE deleted_at IS NULL ORDER BY modified_at DESC
     List<Schedule> findAllByDeletedAtIsNullOrderByModifiedAtDesc();
 
-    // SELECT * FROM schedules WHERE author = ?  AND deleted_at IS NULL ORDER BY modified_at DESC
-    List<Schedule> findAllByAuthorAndDeletedAtIsNullOrderByModifiedAtDesc(String author);
+    // SELECT * FROM schedules WHERE user_id = ?  AND deleted_at IS NULL ORDER BY modified_at DESC
+    List<Schedule> findAllByUser_UserIdAndDeletedAtIsNullOrderByModifiedAtDesc(Long userId);
 
     // SELECT * FROM schedules WHERE schedule_id = ? AND deleted_at IS NULL
     Optional<Schedule> findByScheduleIdAndDeletedAtIsNull(Long scheduleId);
