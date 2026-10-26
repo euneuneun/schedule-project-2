@@ -14,4 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // SELECT * FROM users WHERE deleted_at IS NULL ORDER BY created_at DESC;
     List<User> findAllByDeletedAtIsNullOrderByCreatedAtDesc();
 
+    // SELECT * FROM users WHERE email = ? AND deleted_at IS NULL;
+    Optional<User> findByEmailAndDeletedAtIsNull(String email);
+
 }
