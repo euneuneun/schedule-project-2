@@ -56,17 +56,22 @@ public class ScheduleController {
     }
 
     @PatchMapping("/{scheduleId}")
-    public ResponseEntity<ScheduleResponse> updateSchedule(@PathVariable Long scheduleId, @Valid @RequestBody ScheduleUpdateRequest request){
+    public ResponseEntity<ScheduleResponse> updateSchedule(
+            @SessionAttribute(name = SessionConst.LOGIN_USER) Long loginUserId,
+            @PathVariable Long scheduleId,
+            @Valid @RequestBody ScheduleUpdateRequest request){
 
-        ScheduleResponse response = scheduleService.updateSchedule(scheduleId, request.getTitle(), request.getContent());
+        ScheduleResponse response = scheduleService.updateSchedule(scheduleId, loginUserId, request.getTitle(), request.getContent());
 
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{scheduleId}")
-    public ResponseEntity<Void> deleteSchedule(@PathVariable Long scheduleId){
+    public ResponseEntity<Void> deleteSchedule(
+            @SessionAttribute(name = SessionConst.LOGIN_USER) Long loginUserId,
+            @PathVariable Long scheduleId){
 
-        scheduleService.deletedSchedule(scheduleId);
+        scheduleService.deletedSchedule(scheduleId, loginUserId);
 
         return ResponseEntity.noContent().build();
     }

@@ -81,10 +81,14 @@ public class ScheduleService {
     }
 
     @Transactional
-    public ScheduleResponse updateSchedule(Long scheduleId, String title, String content) {
+    public ScheduleResponse updateSchedule(Long scheduleId, Long loginUserId, String title, String content) {
 
         Schedule schedule = scheduleRepository.findByScheduleIdAndDeletedAtIsNull(scheduleId)
                         .orElseThrow(()-> new IllegalStateException("일정이 존재하지 않습니다."));
+
+        if(!schedule.getUser().getUserId().equals(loginUserId)){
+            throw new IllegalStateException("본인이 작성한 일정만 수정할 수 있습니다.");
+        }
 
         schedule.updateSchedule(title, content);
 
@@ -102,10 +106,14 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void deletedSchedule(Long scheduleId){
+    public void deletedSchedule(Long scheduleId, Long loginUserId){
 
         Schedule schedule = scheduleRepository.findByScheduleIdAndDeletedAtIsNull(scheduleId)
                 .orElseThrow(()-> new IllegalStateException("일정이 존재하지 않습니다"));
+
+        if(!schedule.getUser().getUserId().equals(loginUserId)){
+            throw new IllegalStateException("본인이 작성한 일정만 삭제할 수 있습니다.");
+        }
 
         schedule.delete();
     }
